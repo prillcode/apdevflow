@@ -5,8 +5,8 @@
 ### Product Vision
 APDevFlow (AI-Powered DevFlow) is a **lightweight scrum dashboard and AI-powered development workflow accelerator** that helps Product Owners break down features into epics and stories, and helps developers generate implementation specs using AI skills. The platform works standalone or as a companion to existing project management tools like JIRA.
 
-**Created by:** Aaron Prill, AP Dev Solutions
-**Brand Identity:** APDevFlow - Where "AP" represents both "Agile Programming" and "Aaron Prill"
+**Created by:** Aaron Prill (@prillcode)
+**Brand Identity:** APDevFlow
 **CLI Command:** `devflow` (primary) + `apdev` (alias)
 
 ### Core Philosophy
