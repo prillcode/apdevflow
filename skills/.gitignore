@@ -1,0 +1,11 @@
+# Auto-generated API-adapted prompts
+# These should be regenerated via `npm run adapt`
+*/*/api-prompt.md
+
+# Node modules for scripts
+scripts/node_modules/
+scripts/package-lock.json
+
+# Temporary files
+*.tmp
+*.log

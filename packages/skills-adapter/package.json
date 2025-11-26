@@ -1,0 +1,19 @@
+{
+  "name": "@apdevflow/skills-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Adapts Claude Code skills for API invocation (Bedrock/Claude API)",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "adapt": "ts-node src/adapt-for-api.ts",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0"
+  }
+}

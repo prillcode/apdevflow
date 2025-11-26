@@ -10,6 +10,126 @@ APDevFlow is a lightweight scrum dashboard and AI-powered development workflow a
 
 ---
 
+## ⚡ Quick Setup (New Machine)
+
+This is a **pnpm + Turborepo monorepo**. Follow these steps to get started:
+
+### 1. Prerequisites
+
+Ensure you have the following installed:
+- **Node.js** >= 20.0.0
+- **pnpm** >= 9.0.0
+
+```bash
+# Install pnpm if needed
+npm install -g pnpm@9.0.0
+
+# Verify versions
+node --version  # Should be >= 20
+pnpm --version  # Should be >= 9
+```
+
+### 2. Clone the Repository
+```bash
+git clone https://github.com/prillcode/apdevflow.git
+cd apdevflow
+```
+
+### 3. Install Dependencies
+```bash
+# Install all dependencies for all packages
+pnpm install
+```
+
+This will install dependencies for:
+- Root workspace
+- `apps/web` (React dashboard)
+- `apps/api` (Lambda functions)
+- `apps/cli` (devflow CLI)
+- `packages/shared` (shared types/utils)
+- `packages/skills-adapter` (skill API adaptation)
+
+### 4. Build All Packages
+```bash
+# Build everything in parallel with Turborepo
+pnpm build
+
+# Or build specific packages
+pnpm --filter @apdevflow/shared build
+pnpm --filter @apdevflow/cli build
+```
+
+### 5. Setup Skills Symlinks
+The repository contains Claude Code skills that need to be symlinked to your local Claude skills directory:
+
+```bash
+# Create skills directory if it doesn't exist
+mkdir -p ~/.claude/skills
+
+# Create symlinks (adjust path to match where you cloned the repo)
+REPO_PATH="$PWD"  # Or use absolute path like ~/projects/apdevflow
+
+ln -s "$REPO_PATH/skills/api-skills/epic-feature-creator" ~/.claude/skills/epic-feature-creator
+ln -s "$REPO_PATH/skills/api-skills/feature-story-creator" ~/.claude/skills/feature-story-creator
+ln -s "$REPO_PATH/skills/local-skills/dev-orchestrator" ~/.claude/skills/dev-orchestrator
+ln -s "$REPO_PATH/skills/local-skills/dev-spec" ~/.claude/skills/dev-spec
+ln -s "$REPO_PATH/skills/local-skills/dev-execute" ~/.claude/skills/dev-execute
+ln -s "$REPO_PATH/skills/local-skills/git-commit-helper" ~/.claude/skills/git-commit-helper
+ln -s "$REPO_PATH/skills/local-skills/debug-like-expert" ~/.claude/skills/debug-like-expert
+```
+
+### 6. Verify Setup
+```bash
+# Check that symlinks are created
+ls -la ~/.claude/skills/ | grep apdevflow
+
+# Check that builds succeeded
+ls -la apps/cli/dist
+ls -la packages/shared/dist
+
+# Test CLI (after build)
+node apps/cli/dist/cli.js --version
+```
+
+### 7. Development Workflow
+
+```bash
+# Start development mode (watches for changes)
+pnpm dev
+
+# Run web app only
+pnpm --filter @apdevflow/web dev
+
+# Run CLI in dev mode
+pnpm --filter @apdevflow/cli dev
+
+# Adapt API skills (regenerate api-prompt.md files)
+pnpm adapt-skills
+```
+
+### 8. Useful Commands
+
+```bash
+# Run builds
+pnpm build           # Build all packages
+
+# Clean everything
+pnpm clean           # Remove dist/ and node_modules
+
+# Format code
+pnpm format          # Run Prettier
+
+# Lint code
+pnpm lint            # Run ESLint
+
+# Run tests
+pnpm test            # Run all tests
+```
+
+That's it! The monorepo is set up and ready for development. 🚀
+
+---
+
 ## 📚 Documentation
 
 - **[Product Requirements Document (Revised)](docs/APP-PRD-Revised.md)** - Complete PRD with architecture, workflows, and MVP phases
@@ -105,49 +225,59 @@ APDevFlow is **NOT** just another JIRA plugin. It's a standalone workflow tool t
 
 ## 🧩 Skills Integration
 
-APDevFlow uses Claude Code skills from the **[claudeai-dev](https://github.com/prillcode/claudeai-dev)** repository.
+APDevFlow includes Claude Code skills directly in this repository under [skills/](skills/).
 
-### Skills Used
+### Skills Included
 
-| Skill | Purpose | Mode |
-|-------|---------|------|
-| [epic-feature-creator](https://github.com/prillcode/claudeai-dev/tree/main/agile-skills/epic-feature-creator) | Break down feature → epics | Claude API (Bedrock) |
-| [feature-story-creator](https://github.com/prillcode/claudeai-dev/tree/main/agile-skills/feature-story-creator) | Break down epic → stories | Claude API (Bedrock) |
-| [dev-spec](https://github.com/prillcode/claudeai-dev/tree/main/dev-skills/dev-spec) | Generate implementation specs | Claude Code (local) |
-| [dev-execute](https://github.com/prillcode/claudeai-dev/tree/main/dev-skills/dev-execute) | Implement from spec | Claude Code (local) |
-| [git-commit-helper](https://github.com/prillcode/claudeai-dev/tree/main/dev-skills/git-commit-helper) | Generate commit messages | Claude Code (local) |
+| Skill | Purpose | Mode | Location |
+|-------|---------|------|----------|
+| [epic-feature-creator](skills/api-skills/epic-feature-creator) | Break down feature → epics | Claude API (Bedrock) | `skills/api-skills/` |
+| [feature-story-creator](skills/api-skills/feature-story-creator) | Break down epic → stories | Claude API (Bedrock) | `skills/api-skills/` |
+| [dev-orchestrator](skills/local-skills/dev-orchestrator) | Orchestrate full dev workflow | Claude Code (local) | `skills/local-skills/` |
+| [dev-spec](skills/local-skills/dev-spec) | Generate implementation specs | Claude Code (local) | `skills/local-skills/` |
+| [dev-execute](skills/local-skills/dev-execute) | Implement from spec | Claude Code (local) | `skills/local-skills/` |
+| [git-commit-helper](skills/local-skills/git-commit-helper) | Generate commit messages | Claude Code (local) | `skills/local-skills/` |
+| [debug-like-expert](skills/local-skills/debug-like-expert) | Deep debugging methodology | Claude Code (local) | `skills/local-skills/` |
 
-### Skill Installation (Future)
+### Skill Organization
 
-When the CLI is built, skills will be installed automatically:
+**API Skills** (`skills/api-skills/`)
+- Invoked by backend Lambda functions via Claude API (Bedrock)
+- Used in Planning Dashboard for PO workflows
+- Each skill has `SKILL.md` (full) and `api-prompt.md` (API-adapted)
 
-```bash
-devflow skills install
+**Local Skills** (`skills/local-skills/`)
+- Invoked by developers using Claude Code locally
+- Symlinked to `~/.claude/skills/` for immediate availability
+- Full tool access (Read, Write, Bash, Git, etc.)
+
+### How Skills Work
+
+**Backend (API Skills):**
+```typescript
+// Lambda loads API-adapted prompt
+const prompt = await fs.readFile(
+  './skills/api-skills/epic-feature-creator/api-prompt.md'
+);
+
+// Invoke via Bedrock
+const epics = await bedrock.invokeModel({
+  system: prompt,
+  messages: [{ role: 'user', content: featureDescription }]
+});
 ```
 
-This will:
-1. Clone the `claudeai-dev` repository
-2. Symlink skills to `~/.claude/skills/`
-3. Track version for reproducibility
-
-### How Skills Are Referenced
-
-**Phase 1 (MVP):** Direct reference to public GitHub repo
-- CLI clones `claudeai-dev` at install time
-- Uses `main` branch (or specific tag/commit)
-- Simple, no submodule complexity
-
-**Phase 2 (Production):** Version locking
-- CLI references specific git tags (e.g., `v1.0.0`)
-- Ensures reproducible builds
-- Can upgrade skills independently
-
-**Future:** npm package (if skills become published)
+**Local (Developer Skills):**
 ```bash
-npm install @apdevsolutions/claude-skills
+# Developer uses Claude Code
+cd ~/repos/myapp-story-123
+claude-code
+
+> Use dev-orchestrator to implement this story
+# Claude Code loads ~/.claude/skills/dev-orchestrator/SKILL.md
 ```
 
-See [docs/SKILLS.md](docs/SKILLS.md) for detailed skill reference documentation.
+See [skills/README.md](skills/README.md) for detailed documentation on skill development and usage.
 
 ---
 

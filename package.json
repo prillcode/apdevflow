@@ -1,0 +1,28 @@
+{
+  "name": "apdevflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-Powered Development Workflow Platform",
+  "packageManager": "pnpm@9.0.0",
+  "author": "Aaron Prill (@prillcode)",
+  "license": "TBD",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "clean": "turbo clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "adapt-skills": "pnpm --filter @apdevflow/skills-adapter adapt"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
