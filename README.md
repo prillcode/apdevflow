@@ -1,5 +1,8 @@
 # APDevFlow
 
+<img width="400" height="400" alt="AP_DevFlow_Logo_Clean" src="https://github.com/user-attachments/assets/9c549e10-a0bf-4e4c-a944-9037ce7a6c94" />
+
+
 **AI-Powered Development Workflow Platform**
 
 APDevFlow is a lightweight scrum dashboard and AI-powered development workflow accelerator that helps Product Owners break down features into epics and stories, and helps developers generate implementation specs using AI skills.
