@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { APP_NAME, APP_VERSION } from '@apdevflow/shared';
 import { Button } from '@/components/ui/Button';
 import {
