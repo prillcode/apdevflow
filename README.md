@@ -141,6 +141,7 @@ That's it! The monorepo is set up and ready for development. 🚀
 - **[Git Worktrees Integration](docs/GIT-WORKTREE-STRAT.md)** - Developer workflow with git worktrees
 - **[Branding Guide](docs/BRANDING.md)** - Brand identity and naming conventions
 - **[Skills Reference](docs/SKILLS.md)** - How APDevFlow uses Claude Code skills
+- **[GitHub OAuth Setup](docs/GITHUB_OAUTH_SETUP.md)** - Complete guide to setting up GitHub OAuth integration
 
 ---
 
@@ -363,7 +364,7 @@ See [skills/README.md](skills/README.md) for detailed documentation on skill dev
 
 ## 📋 Current Status
 
-**Phase:** Planning & Documentation ✅
+**Phase:** Early Development 🚀
 
 **Completed:**
 - ✅ Product Requirements Document (revised)
@@ -371,12 +372,21 @@ See [skills/README.md](skills/README.md) for detailed documentation on skill dev
 - ✅ Integration strategy
 - ✅ Cost modeling
 - ✅ Skills identification
+- ✅ Planning Dashboard UI (localStorage-based)
+- ✅ GitHub OAuth integration (frontend + backend)
+- ✅ Monorepo setup with Turborepo
+
+**In Progress:**
+- 🔨 AWS Lambda deployment setup
+- 🔨 DynamoDB schema design
+- 🔨 Bedrock integration for spec generation
 
 **Next Steps:**
-1. Setup AWS account + CDK project
-2. Prototype Bedrock skill invocation
-3. Design UI mockups
-4. Build CLI skeleton
+1. Deploy Lambda functions to AWS
+2. Set up DynamoDB tables
+3. Integrate Claude API for spec generation
+4. Build developer dashboard
+5. Implement CLI tool
 
 ---
 
