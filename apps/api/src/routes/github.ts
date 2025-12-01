@@ -24,4 +24,25 @@ github.post('/oauth/exchange', async (c) => {
   }
 });
 
+// GET /api/github/repos/:owner/:repo/files
+github.get('/repos/:owner/:repo/files', async (c) => {
+  try {
+    const { owner, repo } = c.req.param();
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+
+    if (!token) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const files = await GitHubService.fetchRepoFiles(owner, repo, token);
+    
+    return c.json(files);
+  } catch (error) {
+    console.error('Fetch repo files error:', error);
+    return c.json({ 
+      error: error instanceof Error ? error.message : 'Failed to fetch files' 
+    }, 500);
+  }
+});
+
 export default github;

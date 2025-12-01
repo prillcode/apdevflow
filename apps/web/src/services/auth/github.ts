@@ -217,6 +217,42 @@ export class GitHubAuthService {
     }
   }
 
+  // Fetch repository files
+  static async fetchRepoFiles(repoFullName: string): Promise<{
+    files: Array<{ path: string; type: string; size?: number; sha: string }>;
+    truncated: boolean;
+  } | null> {
+    const token = this.getToken()?.accessToken;
+    if (!token) {
+      console.error('No access token available');
+      return null;
+    }
+
+    try {
+      const [owner, repo] = repoFullName.split('/');
+      
+      const response = await fetch(
+        `${API_URL}/api/github/repos/${owner}/${repo}/files`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error('Failed to fetch repository files');
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching repository files:', error);
+      return null;
+    }
+  }
+
   // Validate repository access
   static async validateRepoAccess(repoFullName: string): Promise<boolean> {
     const token = this.getToken()?.accessToken;
