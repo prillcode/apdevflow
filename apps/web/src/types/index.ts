@@ -39,3 +39,26 @@ export interface CreateBodyOfWorkInput {
   repo?: string;
   contextReferences: ContextReference[];
 }
+
+// GitHub OAuth Types
+export interface GitHubAuthToken {
+  accessToken: string;
+  tokenType: string;
+  scope: string;
+  expiresAt?: string;
+}
+
+export interface GitHubUser {
+  login: string;
+  id: number;
+  avatarUrl: string;
+  name: string | null;
+  email: string | null;
+  htmlUrl: string;
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  token: GitHubAuthToken | null;
+  user: GitHubUser | null;
+}
