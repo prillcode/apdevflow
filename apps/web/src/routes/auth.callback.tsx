@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { AuthService } from '../services/auth';
+import { GitHubAuthService } from '../services/auth';
 
 export const Route = createFileRoute('/auth/callback')({
   component: AuthCallbackComponent,
@@ -36,7 +36,7 @@ function AuthCallbackComponent() {
         }
 
         // Handle OAuth callback
-        const success = await AuthService.handleOAuthCallback(code, state);
+        const success = await GitHubAuthService.handleOAuthCallback(code, state);
 
         if (success) {
           setStatus('success');

@@ -2,7 +2,7 @@ import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { APP_NAME } from '@apdevflow/shared';
 import { useState, useEffect } from 'react';
-import { AuthService } from '../services/auth';
+import { GitHubAuthService } from '../services/auth';
 import type { AuthState } from '../types';
 
 export const Route = createRootRoute({
@@ -10,12 +10,12 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  const [authState, setAuthState] = useState<AuthState>(AuthService.getAuthState());
+  const [authState, setAuthState] = useState<AuthState>(GitHubAuthService.getAuthState());
 
   useEffect(() => {
     // Update auth state on mount and when localStorage changes
     const updateAuthState = () => {
-      setAuthState(AuthService.getAuthState());
+      setAuthState(GitHubAuthService.getAuthState());
     };
 
     updateAuthState();
@@ -29,13 +29,13 @@ function RootComponent() {
   }, []);
 
   const handleConnect = () => {
-    AuthService.initiateGitHubAuth();
+    GitHubAuthService.initiateGitHubAuth();
   };
 
   const handleDisconnect = () => {
     if (confirm('Are you sure you want to disconnect from GitHub?')) {
-      AuthService.logout();
-      setAuthState(AuthService.getAuthState());
+      GitHubAuthService.logout();
+      setAuthState(GitHubAuthService.getAuthState());
     }
   };
 

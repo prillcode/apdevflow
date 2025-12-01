@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
-import { AuthService } from '../services/auth';
+import { GitHubAuthService } from '../services/auth';
 import type { AuthState } from '../types';
 
 export function GitHubConnect() {
-  const [authState, setAuthState] = useState<AuthState>(AuthService.getAuthState());
+  const [authState, setAuthState] = useState<AuthState>(GitHubAuthService.getAuthState());
 
   useEffect(() => {
     // Update auth state on mount
-    setAuthState(AuthService.getAuthState());
+    setAuthState(GitHubAuthService.getAuthState());
   }, []);
 
   const handleConnect = () => {
-    AuthService.initiateGitHubAuth();
+    GitHubAuthService.initiateGitHubAuth();
   };
 
   const handleDisconnect = () => {
     if (confirm('Are you sure you want to disconnect from GitHub?')) {
-      AuthService.logout();
-      setAuthState(AuthService.getAuthState());
+      GitHubAuthService.logout();
+      setAuthState(GitHubAuthService.getAuthState());
     }
   };
 
