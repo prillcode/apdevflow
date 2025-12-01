@@ -1,18 +1,18 @@
-// LocalStorage service for Bodies of Work
+// LocalStorage service for Items of DevWork
 import type {
-  BodyOfWork,
-  CreateBodyOfWorkInput,
+  DevWork,
+  CreateDevWorkInput,
   WorkflowState,
 } from '../types';
 
-const STORAGE_KEY = 'apdevflow_bodies_of_work';
+const STORAGE_KEY = 'apdevflow_dev_work';
 
 export class StorageService {
   private static generateId(): string {
     return `bow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  static getAllBodiesOfWork(): BodyOfWork[] {
+  static getAllDevWork(): DevWork[] {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
       return data ? JSON.parse(data) : [];
@@ -22,14 +22,14 @@ export class StorageService {
     }
   }
 
-  static getBodyOfWorkById(id: string): BodyOfWork | null {
-    const all = this.getAllBodiesOfWork();
+  static getDevWorkById(id: string): DevWork | null {
+    const all = this.getAllDevWork();
     return all.find((bow) => bow.id === id) || null;
   }
 
-  static createBodyOfWork(input: CreateBodyOfWorkInput): BodyOfWork {
+  static createDevWork(input: CreateDevWorkInput): DevWork {
     const now = new Date().toISOString();
-    const newBodyOfWork: BodyOfWork = {
+    const newDevWork: DevWork = {
       id: this.generateId(),
       ...input,
       workflowState: 'Draft',
@@ -37,30 +37,30 @@ export class StorageService {
       updatedAt: now,
     };
 
-    const all = this.getAllBodiesOfWork();
-    all.push(newBodyOfWork);
-    this.saveBodiesOfWork(all);
+    const all = this.getAllDevWork();
+    all.push(newDevWork);
+    this.saveDevWork(all);
 
-    return newBodyOfWork;
+    return newDevWork;
   }
 
-  static updateBodyOfWork(
+  static updateDevWork(
     id: string,
-    updates: Partial<Omit<BodyOfWork, 'id' | 'createdAt'>>
-  ): BodyOfWork | null {
-    const all = this.getAllBodiesOfWork();
+    updates: Partial<Omit<DevWork, 'id' | 'createdAt'>>
+  ): DevWork | null {
+    const all = this.getAllDevWork();
     const index = all.findIndex((bow) => bow.id === id);
 
     if (index === -1) return null;
 
-    const updated: BodyOfWork = {
+    const updated: DevWork = {
       ...all[index],
       ...updates,
       updatedAt: new Date().toISOString(),
     };
 
     all[index] = updated;
-    this.saveBodiesOfWork(all);
+    this.saveDevWork(all);
 
     return updated;
   }
@@ -68,23 +68,23 @@ export class StorageService {
   static updateWorkflowState(
     id: string,
     state: WorkflowState
-  ): BodyOfWork | null {
-    return this.updateBodyOfWork(id, { workflowState: state });
+  ): DevWork | null {
+    return this.updateDevWork(id, { workflowState: state });
   }
 
-  static deleteBodyOfWork(id: string): boolean {
-    const all = this.getAllBodiesOfWork();
+  static deleteDevWork(id: string): boolean {
+    const all = this.getAllDevWork();
     const filtered = all.filter((bow) => bow.id !== id);
 
     if (filtered.length === all.length) return false;
 
-    this.saveBodiesOfWork(filtered);
+    this.saveDevWork(filtered);
     return true;
   }
 
-  private static saveBodiesOfWork(bodies: BodyOfWork[]): void {
+  private static saveDevWork(devwork: DevWork[]): void {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(bodies));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(devwork));
     } catch (error) {
       console.error('Error writing to localStorage:', error);
     }

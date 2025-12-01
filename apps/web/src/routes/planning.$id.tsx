@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
 import { StorageService } from '../services/storage';
-import type { BodyOfWork, WorkflowState } from '../types';
+import type { DevWork, WorkflowState } from '../types';
 
 export const Route = createFileRoute('/planning/$id')({
   component: BodyOfWorkDetailComponent,
@@ -10,13 +10,13 @@ export const Route = createFileRoute('/planning/$id')({
 function BodyOfWorkDetailComponent() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const [bodyOfWork, setBodyOfWork] = useState<BodyOfWork | null>(null);
+  const [bodyOfWork, setBodyOfWork] = useState<DevWork | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    const bow = StorageService.getBodyOfWorkById(id);
+    const bow = StorageService.getDevWorkById(id);
     if (!bow) {
-      alert('Body of work not found');
+      alert('Dev work not found');
       navigate({ to: '/planning' });
       return;
     }
@@ -42,7 +42,7 @@ function BodyOfWorkDetailComponent() {
         'Copy the following prompt and paste it into Claude Code:\n\n' + prompt
       );
       // For now, we'll just mark it as generated
-      const updated = StorageService.updateBodyOfWork(id, {
+      const updated = StorageService.updateDevWork(id, {
         generatedSpec: 'Spec generated manually (placeholder)',
         workflowState: 'Spec Generated',
       });
@@ -52,7 +52,7 @@ function BodyOfWorkDetailComponent() {
       setIsGenerating(true);
       // Placeholder for future Claude API integration
       setTimeout(() => {
-        const updated = StorageService.updateBodyOfWork(id, {
+        const updated = StorageService.updateDevWork(id, {
           generatedSpec: 'API-generated spec (placeholder - to be implemented)',
           workflowState: 'Spec Generated',
         });
@@ -65,10 +65,10 @@ function BodyOfWorkDetailComponent() {
   const handleDelete = () => {
     if (
       window.confirm(
-        'Are you sure you want to delete this body of work? This action cannot be undone.'
+        'Are you sure you want to delete this item of work? This action cannot be undone.'
       )
     ) {
-      StorageService.deleteBodyOfWork(id);
+      StorageService.deleteDevWork(id);
       navigate({ to: '/planning' });
     }
   };
@@ -225,7 +225,7 @@ function BodyOfWorkDetailComponent() {
         ) : (
           <div>
             <p className="text-sm text-gray-600 mb-4">
-              Generate a technical specification or PRD from this body of work.
+              Generate a technical specification or PRD from this item of dev work.
               Choose manual mode to copy a prompt for Claude Code, or use API
               mode for automatic generation (requires Claude API setup).
             </p>
@@ -255,7 +255,7 @@ function BodyOfWorkDetailComponent() {
             Ready for Development
           </h3>
           <p className="text-sm text-blue-800 mb-4">
-            This body of work is ready to move into development. Next steps:
+            This item of work is ready to move into development. Next steps:
           </p>
           <ol className="list-decimal list-inside text-sm text-blue-800 space-y-1">
             <li>Create Epic(s) from the Tech Spec/PRD</li>
@@ -270,8 +270,8 @@ function BodyOfWorkDetailComponent() {
   );
 }
 
-function generatePromptForSpec(bodyOfWork: BodyOfWork): string {
-  let prompt = `Create a technical specification (Tech Spec/PRD) for the following body of work:\n\n`;
+function generatePromptForSpec(bodyOfWork: DevWork): string {
+  let prompt = `Create a technical specification (Tech Spec/PRD) for the following item of work:\n\n`;
   prompt += `Title: ${bodyOfWork.title}\n`;
   prompt += `Type: ${bodyOfWork.type}${bodyOfWork.typeOther ? ` (${bodyOfWork.typeOther})` : ''}\n\n`;
   prompt += `Description:\n${bodyOfWork.description}\n\n`;

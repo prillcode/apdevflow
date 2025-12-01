@@ -1,11 +1,11 @@
 // Types for APDevFlow Planning Dashboard
 
 export type WorkType =
-  | 'Feature Request to existing App'
-  | 'Iterative Improvements to existing feature(s)'
-  | 'Brand New App/Initiative'
-  | 'New Integration to existing App'
-  | 'Alterations to Process/App Component'
+  | 'Feature Request(s)'
+  | 'Improvements/Fixes'
+  | 'Updates to Process/Component'
+  | 'New App/Initiative'
+  | 'New App Integration'
   | 'Other';
 
 export type WorkflowState = 'Draft' | 'Spec Generated' | 'Ready for Development';
@@ -17,7 +17,7 @@ export interface ContextReference {
   label: string; // display name
 }
 
-export interface BodyOfWork {
+export interface DevWork {
   id: string;
   title: string;
   type: WorkType;
@@ -31,7 +31,7 @@ export interface BodyOfWork {
   updatedAt: string;
 }
 
-export interface CreateBodyOfWorkInput {
+export interface CreateDevWorkInput {
   title: string;
   type: WorkType;
   typeOther?: string;

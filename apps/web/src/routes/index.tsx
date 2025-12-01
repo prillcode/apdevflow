@@ -6,14 +6,14 @@ export const Route = createFileRoute('/')({
 });
 
 function DashboardComponent() {
-  const bodiesOfWork = StorageService.getAllBodiesOfWork();
+  const devWorkItems = StorageService.getAllDevWork();
 
   const stateCounts = {
-    Draft: bodiesOfWork.filter((b) => b.workflowState === 'Draft').length,
-    'Spec Generated': bodiesOfWork.filter(
+    Draft: devWorkItems.filter((b) => b.workflowState === 'Draft').length,
+    'Spec Generated': devWorkItems.filter(
       (b) => b.workflowState === 'Spec Generated'
     ).length,
-    'Ready for Development': bodiesOfWork.filter(
+    'Ready for Development': devWorkItems.filter(
       (b) => b.workflowState === 'Ready for Development'
     ).length,
   };
@@ -33,7 +33,7 @@ function DashboardComponent() {
           title="Draft"
           count={stateCounts.Draft}
           color="blue"
-          description="New bodies of work"
+          description="New items of work"
         />
         <StatCard
           title="Spec Generated"
@@ -59,7 +59,7 @@ function DashboardComponent() {
             to="/planning/new"
             className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
-            Plan New Body of Work
+            Plan New Dev Work
           </Link>
           <Link
             to="/planning"
@@ -73,15 +73,15 @@ function DashboardComponent() {
       {/* Recent Items */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Recent Bodies of Work
+          Recent Work
         </h3>
-        {bodiesOfWork.length === 0 ? (
+        {devWorkItems.length === 0 ? (
           <p className="text-gray-500 text-center py-8">
-            No bodies of work yet. Create your first one to get started!
+            No items of work yet. Create your first one to get started!
           </p>
         ) : (
           <div className="space-y-3">
-            {bodiesOfWork.slice(0, 5).map((bow) => (
+            {devWorkItems.slice(0, 5).map((bow) => (
               <Link
                 key={bow.id}
                 to="/planning/$id"

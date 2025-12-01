@@ -1,21 +1,21 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { StorageService } from '../services/storage';
-import type { BodyOfWork } from '../types';
+import type { DevWork } from '../types';
 
 export const Route = createFileRoute('/planning/')({
   component: PlanningListComponent,
 });
 
 function PlanningListComponent() {
-  const bodiesOfWork = StorageService.getAllBodiesOfWork();
+  const devWorkItems = StorageService.getAllDevWork();
 
   const handleDelete = (id: string) => {
     if (
       window.confirm(
-        'Are you sure you want to delete this body of work? This action cannot be undone.'
+        'Are you sure you want to delete this item of work? This action cannot be undone.'
       )
     ) {
-      StorageService.deleteBodyOfWork(id);
+      StorageService.deleteDevWork(id);
       // Force a re-render by navigating to the same route
       window.location.reload();
     }
@@ -29,18 +29,18 @@ function PlanningListComponent() {
             Planning Dashboard
           </h2>
           <p className="mt-2 text-gray-600">
-            Manage all your bodies of work in one place
+            Manage all your dev work in one place
           </p>
         </div>
         <Link
           to="/planning/new"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
         >
-          + Plan New Body of Work
+          + Plan New Dev Work
         </Link>
       </div>
 
-      {bodiesOfWork.length === 0 ? (
+      {devWorkItems.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
@@ -56,17 +56,17 @@ function PlanningListComponent() {
             />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No bodies of work
+            No items of work
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            Get started by creating a new body of work
+            Get started by creating a new item of work
           </p>
           <div className="mt-6">
             <Link
               to="/planning/new"
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
             >
-              + Plan New Body of Work
+              + Plan New Dev Work
             </Link>
           </div>
         </div>
@@ -93,7 +93,7 @@ function PlanningListComponent() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {bodiesOfWork.map((bow) => (
+              {devWorkItems.map((bow) => (
                 <BodyOfWorkRow
                   key={bow.id}
                   bow={bow}
@@ -109,7 +109,7 @@ function PlanningListComponent() {
 }
 
 interface BodyOfWorkRowProps {
-  bow: BodyOfWork;
+  bow: DevWork;
   onDelete: (id: string) => void;
 }
 

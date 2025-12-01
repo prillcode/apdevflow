@@ -11,7 +11,7 @@ This guide walks you through setting up GitHub OAuth integration for APDevFlow.
 The GitHub OAuth integration allows users to:
 - Connect their GitHub account to APDevFlow
 - Access private repositories
-- Validate repository access when planning bodies of work
+- Validate repository access when planning items of work
 
 ## Architecture
 

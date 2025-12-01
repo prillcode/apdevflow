@@ -7,12 +7,20 @@ export const Route = createFileRoute('/planning/new')({
   component: NewBodyOfWorkComponent,
 });
 
+/*
+  | 'Feature Request(s)'
+  | 'Improvements/Fixes'
+  | 'Updates to Process/Component'
+  | 'New App/Initiative'
+  | 'New App Integration'
+  | 'Other';
+*/
 const WORK_TYPES: WorkType[] = [
-  'Feature Request to existing App',
-  'Iterative Improvements to existing feature(s)',
-  'Brand New App/Initiative',
-  'New Integration to existing App',
-  'Alterations to Process/App Component',
+  'Feature Request(s)',
+  'Improvements/Fixes',
+  'Updates to Process/Component',
+  'New App/Initiative',
+  'New App Integration',
   'Other',
 ];
 
@@ -20,7 +28,7 @@ function NewBodyOfWorkComponent() {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [type, setType] = useState<WorkType>(
-    'Feature Request to existing App'
+    'Feature Request(s)'
   );
   const [typeOther, setTypeOther] = useState('');
   const [description, setDescription] = useState('');
@@ -82,7 +90,7 @@ function NewBodyOfWorkComponent() {
       return;
     }
 
-    const bodyOfWork = StorageService.createBodyOfWork({
+    const devWork = StorageService.createDevWork({
       title: title.trim(),
       type,
       typeOther: type === 'Other' ? typeOther.trim() : undefined,
@@ -91,14 +99,14 @@ function NewBodyOfWorkComponent() {
       contextReferences,
     });
 
-    navigate({ to: '/planning/$id', params: { id: bodyOfWork.id } });
+    navigate({ to: '/planning/$id', params: { id: devWork.id } });
   };
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-gray-900">
-          Plan New Body of Work
+          Plan New Dev Work
         </h2>
         <p className="mt-2 text-gray-600">
           Describe the work to be done in natural language
@@ -188,7 +196,7 @@ function NewBodyOfWorkComponent() {
               onChange={(e) => setDescription(e.target.value)}
               rows={8}
               className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-              placeholder="Provide as much detail as you want about this body of work..."
+              placeholder="Provide as much detail as you want about this item of development work..."
               required
             />
           </div>
@@ -336,7 +344,7 @@ function NewBodyOfWorkComponent() {
             type="submit"
             className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
-            Create Body of Work
+            Create
           </button>
         </div>
       </form>
