@@ -32,36 +32,67 @@ pnpm dev
 
 The web app will start at `http://localhost:3000`.
 
-### Option 2: AWS Deployment (Coming Soon)
+### Option 2: AWS Lambda Deployment
 
-Deploy to AWS using CloudFormation/CDK templates.
+Deploy the Hono API to AWS Lambda using the built-in adapter.
 
 **What you'll need:**
 - AWS account
 - GitHub OAuth app (production callback URL)
-- Domain name (optional, can use CloudFront URL)
+- Domain name (optional, can use API Gateway URL)
 
 **AWS Services used:**
-- Lambda (Node.js functions)
+- Lambda (Hono API with adapter)
 - API Gateway (REST API)
 - S3 (static hosting + artifacts)
 - DynamoDB (data storage)
-- CloudFront (CDN)
+- CloudFront (CDN for frontend)
 
-**Status:** Deployment scripts and IaC templates coming in Phase 2.
+**Deployment:**
+```bash
+# Build Lambda package
+cd apps/api
+pnpm build:lambda
 
-### Option 3: Docker / VPS (Coming Soon)
+# Deploy using AWS SAM, Serverless Framework, or CDK
+# Entry point: dist/lambda.handler
+```
 
-Self-host on any Linux VPS using Docker Compose.
+**Status:** API refactored and ready. IaC templates coming in Phase 2.
+
+### Option 3: Docker / VPS Deployment
+
+Self-host on any Linux VPS or container platform (Fly.io, Railway, Render, etc.).
 
 **What you'll need:**
-- Linux VPS (Ubuntu/Debian recommended)
-- Docker + Docker Compose
+- Linux VPS or container platform account
 - GitHub OAuth app
 - Database (PostgreSQL, MySQL, or Turso Cloud)
 - Object storage (S3-compatible or local)
 
-**Status:** Docker Compose configuration coming in Phase 2.
+**Deployment:**
+```bash
+# Build the API
+cd apps/api
+pnpm build
+
+# Run with Node.js
+node dist/server.js
+
+# Or use Docker
+docker build -t apdevflow-api .
+docker run -p 3001:3001 apdevflow-api
+```
+
+**Supported Platforms:**
+- **Fly.io** - `fly launch` (easiest, ~$5/month)
+- **Railway** - Connect GitHub repo, auto-deploy
+- **Render** - Connect GitHub repo, auto-deploy
+- **DigitalOcean App Platform** - Deploy from GitHub
+- **AWS ECS/Fargate** - Containerized deployment
+- **Any VPS** - Ubuntu/Debian with Node.js 20+
+
+**Status:** API refactored to pure Hono. Ready for deployment to any platform.
 
 ## Current Status
 
@@ -132,46 +163,79 @@ When you self-host APDevFlow:
 
 ## Deployment Architecture
 
-Each self-hosted instance is completely independent:
+The API is built with Hono, a lightweight web framework that runs anywhere:
 
 ```
-Your Organization's Deployment:
-┌─────────────────────────────────────┐
-│ Your AWS Account / VPS              │
-│                                     │
-│  ┌─────────────────────────────┐   │
-│  │ APDevFlow Instance          │   │
-│  │ - Your GitHub OAuth App     │   │
-│  │ - Your Database             │   │
-│  │ - Your Object Storage       │   │
-│  │ - Your Lambda Functions     │   │
-│  └─────────────────────────────┘   │
-└─────────────────────────────────────┘
-         ↓ OAuth Flow
-    GitHub.com (Your OAuth App)
+┌─────────────────────────────────────────────┐
+│ APDevFlow Architecture                      │
+├─────────────────────────────────────────────┤
+│                                             │
+│  Frontend (React SPA)                       │
+│  ├─ Vite build → Static files              │
+│  └─ Deploy to: S3+CloudFront, Vercel, etc. │
+│                                             │
+│  Backend (Hono API)                         │
+│  ├─ Pure Hono application                  │
+│  ├─ Deploy to: Lambda, Fly.io, Railway,    │
+│  │              ECS, VPS, etc.             │
+│  └─ Adapters: AWS Lambda, Node.js server   │
+│                                             │
+│  Data Layer                                 │
+│  └─ DynamoDB, PostgreSQL, MySQL, or Turso  │
+│                                             │
+└─────────────────────────────────────────────┘
 ```
 
-## Future Deployment Options
+**Deployment Flexibility:**
+- **Lambda:** Use `lambda.ts` adapter for serverless
+- **Node.js:** Use `server.ts` for always-on deployments
+- **Docker:** Containerize for any platform
+- **Edge:** Deploy to Cloudflare Workers (future)
 
-We're planning to support multiple deployment patterns:
+## Deployment Options Summary
 
-### AWS Deployment
-- **IaC:** CloudFormation/CDK templates
-- **Services:** Lambda, API Gateway, DynamoDB, S3, CloudFront
-- **Setup Time:** ~15 minutes (automated)
-- **Cost:** ~$5-15/month (based on usage)
+The Hono refactor enables deployment to multiple platforms:
 
-### Docker Compose (VPS)
-- **Platform:** Any Linux VPS (DigitalOcean, Linode, etc.)
-- **Services:** Docker containers + PostgreSQL/MySQL + local/S3 storage
-- **Setup Time:** ~10 minutes
-- **Cost:** VPS cost ($5-20/month depending on size)
+### AWS Lambda (Serverless)
+- **Setup:** Use `@hono/aws-lambda` adapter (already included)
+- **Entry Point:** `dist/lambda.handler`
+- **IaC:** CloudFormation/CDK templates (coming soon)
+- **Cost:** ~$5-15/month (pay per request)
+- **Pros:** Auto-scaling, no server management
+- **Cons:** Cold starts (~100-500ms)
+
+### Fly.io (Easiest)
+- **Setup:** `fly launch` from project root
+- **Build:** `pnpm build` → `node dist/server.js`
+- **Cost:** ~$5-10/month (always-on)
+- **Pros:** No cold starts, simple deployment, global edge
+- **Cons:** Requires credit card
+
+### Railway / Render
+- **Setup:** Connect GitHub repo, auto-deploy on push
+- **Build Command:** `pnpm build`
+- **Start Command:** `node apps/api/dist/server.js`
+- **Cost:** ~$5-20/month
+- **Pros:** GitHub integration, easy setup
+- **Cons:** Limited free tier
+
+### AWS ECS/Fargate (Container)
+- **Setup:** Docker image + ECS task definition
+- **Cost:** ~$15-30/month (always-on)
+- **Pros:** No cold starts, full AWS integration
+- **Cons:** More complex setup
+
+### VPS (DigitalOcean, Linode, etc.)
+- **Setup:** Install Node.js 20+, clone repo, run server
+- **Cost:** $5-20/month (VPS cost)
+- **Pros:** Full control, predictable pricing
+- **Cons:** Manual server management
 
 ### Kubernetes
-- **Platform:** Any k8s cluster (EKS, GKE, self-hosted)
-- **Setup:** Helm charts
-- **Scale:** Multi-replica deployments
-- **Use Case:** Enterprise deployments
+- **Setup:** Helm charts (coming soon)
+- **Use Case:** Enterprise deployments, multi-replica
+- **Pros:** High availability, auto-scaling
+- **Cons:** Complex setup, higher cost
 
 ## Support & Community
 

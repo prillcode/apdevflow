@@ -220,8 +220,10 @@ See [Competitive Differentiation](docs/MARKETING-IDEAS.md#-competitive-different
 │     - devflow finish story-123             │
 │     - devflow skills install               │
 │                                             │
-│  ☁️ Backend (AWS Serverless)               │
-│     - Lambda functions                     │
+│  ☁️ Backend (Hono API)                     │
+│     - Pure Hono application                │
+│     - Deploy anywhere: Lambda, Fly.io,     │
+│       Railway, ECS, VPS, etc.              │
 │     - DynamoDB (Features/Epics/Stories)   │
 │     - S3 (artifacts, exports)              │
 │     - Bedrock (Claude API for PO flows)    │
@@ -244,11 +246,16 @@ See [Competitive Differentiation](docs/MARKETING-IDEAS.md#-competitive-different
 - Vite
 
 **Backend:**
-- AWS Lambda (Node.js 20.x)
-- DynamoDB
-- S3
+- Hono (lightweight web framework)
+- Node.js 20.x
+- Deployment options:
+  - AWS Lambda (serverless)
+  - Fly.io / Railway (PaaS)
+  - AWS ECS/Fargate (containers)
+  - VPS (DigitalOcean, Linode, etc.)
+- DynamoDB / PostgreSQL / MySQL
+- S3 (artifacts, exports)
 - Bedrock (Claude API)
-- API Gateway
 
 **CLI:**
 - TypeScript (compiled to Node.js)
@@ -404,18 +411,21 @@ See [skills/README.md](skills/README.md) for detailed documentation on skill dev
 - ✅ Planning Dashboard UI (localStorage-based)
 - ✅ GitHub OAuth integration (frontend + backend)
 - ✅ Monorepo setup with Turborepo
+- ✅ API refactored to pure Hono architecture
+- ✅ GitHub repository file path autocomplete
+- ✅ Deployment-agnostic backend (Lambda, Fly.io, Railway, VPS)
 
 **In Progress:**
-- 🔨 AWS Lambda deployment setup
 - 🔨 DynamoDB schema design
 - 🔨 Bedrock integration for spec generation
+- 🔨 Deployment automation (IaC templates)
 
 **Next Steps:**
-1. Deploy Lambda functions to AWS
-2. Set up DynamoDB tables
-3. Integrate Claude API for spec generation
-4. Build developer dashboard
-5. Implement CLI tool
+1. Complete database integration (DynamoDB/PostgreSQL)
+2. Add Bedrock integration for AI-powered planning
+3. Build developer dashboard
+4. Implement CLI tool
+5. Create deployment templates (AWS CDK, Docker Compose)
 
 ---
 
