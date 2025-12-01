@@ -40,6 +40,8 @@ function AuthCallbackComponent() {
 
         if (success) {
           setStatus('success');
+          // Notify app of auth state change
+          window.dispatchEvent(new Event('auth-state-changed'));
           // Redirect to dashboard after 1 second
           setTimeout(() => {
             navigate({ to: '/' });

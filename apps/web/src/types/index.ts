@@ -46,6 +46,7 @@ export interface GitHubAuthToken {
   tokenType: string;
   scope: string;
   expiresAt?: string;
+  authMethod: 'oauth' | 'token';
 }
 
 export interface GitHubUser {
@@ -59,6 +60,7 @@ export interface GitHubUser {
 
 export interface AuthState {
   isAuthenticated: boolean;
+  authMethod: 'oauth' | 'token';
   token: GitHubAuthToken | null;
   user: GitHubUser | null;
 }

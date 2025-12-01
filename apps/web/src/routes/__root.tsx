@@ -3,6 +3,7 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { APP_NAME } from '@apdevflow/shared';
 import { useState, useEffect } from 'react';
 import { GitHubAuthService } from '../services/auth';
+import { GitHubConnect } from '../components/GitHubConnect';
 import type { AuthState } from '../types';
 
 export const Route = createRootRoute({
@@ -11,6 +12,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const [authState, setAuthState] = useState<AuthState>(GitHubAuthService.getAuthState());
+  const [showConnectModal, setShowConnectModal] = useState(false);
 
   useEffect(() => {
     // Update auth state on mount and when localStorage changes
@@ -22,21 +24,26 @@ function RootComponent() {
 
     // Listen for storage changes (for cross-tab updates)
     window.addEventListener('storage', updateAuthState);
+    // Listen for custom auth state changes (same-tab updates)
+    window.addEventListener('auth-state-changed', updateAuthState);
 
     return () => {
       window.removeEventListener('storage', updateAuthState);
+      window.removeEventListener('auth-state-changed', updateAuthState);
     };
   }, []);
-
-  const handleConnect = () => {
-    GitHubAuthService.initiateGitHubAuth();
-  };
 
   const handleDisconnect = () => {
     if (confirm('Are you sure you want to disconnect from GitHub?')) {
       GitHubAuthService.logout();
       setAuthState(GitHubAuthService.getAuthState());
+      window.dispatchEvent(new Event('auth-state-changed'));
     }
+  };
+
+  const handleConnectSuccess = () => {
+    setAuthState(GitHubAuthService.getAuthState());
+    setShowConnectModal(false);
   };
 
   return (
@@ -92,7 +99,7 @@ function RootComponent() {
                 </div>
               ) : (
                 <button
-                  onClick={handleConnect}
+                  onClick={() => setShowConnectModal(true)}
                   className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <svg
@@ -118,6 +125,29 @@ function RootComponent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
+
+      {/* Connection Modal */}
+      {showConnectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowConnectModal(false)}
+          />
+          <div className="relative z-10 w-full max-w-2xl">
+            <div className="flex justify-end mb-2">
+              <button
+                onClick={() => setShowConnectModal(false)}
+                className="text-white hover:text-gray-300"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <GitHubConnect onSuccess={handleConnectSuccess} />
+          </div>
+        </div>
+      )}
 
       {/* Router DevTools (only in development) */}
       <TanStackRouterDevtools position="bottom-right" />

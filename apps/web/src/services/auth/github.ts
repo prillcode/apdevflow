@@ -4,6 +4,7 @@ import type { GitHubAuthToken, GitHubUser, AuthState } from '../../types';
 const AUTH_TOKEN_KEY = 'apdevflow_github_token';
 const AUTH_USER_KEY = 'apdevflow_github_user';
 const AUTH_STATE_KEY = 'apdevflow_oauth_state';
+const AUTH_METHOD_KEY = 'apdevflow_github_auth_method';
 
 // Environment variables (to be set in .env.local)
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || '';
@@ -20,9 +21,11 @@ export class GitHubAuthService {
   static getAuthState(): AuthState {
     const token = this.getToken();
     const user = this.getUser();
+    const authMethod = this.getAuthMethod() || 'oauth';
 
     return {
       isAuthenticated: !!token && !!user,
+      authMethod,
       token,
       user,
     };
@@ -60,6 +63,25 @@ export class GitHubAuthService {
     }
   }
 
+  // Get auth method
+  static getAuthMethod(): 'oauth' | 'token' | null {
+    try {
+      const method = localStorage.getItem(AUTH_METHOD_KEY);
+      return method as 'oauth' | 'token' | null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Save auth method
+  private static saveAuthMethod(method: 'oauth' | 'token'): void {
+    try {
+      localStorage.setItem(AUTH_METHOD_KEY, method);
+    } catch (error) {
+      console.error('Error saving auth method:', error);
+    }
+  }
+
   // Save token to localStorage
   private static saveToken(token: GitHubAuthToken): void {
     try {
@@ -91,6 +113,7 @@ export class GitHubAuthService {
 
     const state = this.generateState();
     localStorage.setItem(AUTH_STATE_KEY, state);
+    this.saveAuthMethod('oauth');
 
     const params = new URLSearchParams({
       client_id: GITHUB_CLIENT_ID,
@@ -120,7 +143,7 @@ export class GitHubAuthService {
       localStorage.removeItem(AUTH_STATE_KEY);
 
       // Exchange code for token via API Lambda
-      const response = await fetch(`${API_URL}/api/github-oauth-exchange`, {
+      const response = await fetch(`${API_URL}/api/github/oauth/exchange`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,6 +164,7 @@ export class GitHubAuthService {
         accessToken: data.access_token,
         tokenType: data.token_type,
         scope: data.scope,
+        authMethod: 'oauth',
       };
       this.saveToken(token);
 
@@ -284,6 +308,7 @@ export class GitHubAuthService {
       localStorage.removeItem(AUTH_TOKEN_KEY);
       localStorage.removeItem(AUTH_USER_KEY);
       localStorage.removeItem(AUTH_STATE_KEY);
+      localStorage.removeItem(AUTH_METHOD_KEY);
     } catch (error) {
       console.error('Error clearing auth data:', error);
     }
@@ -292,5 +317,50 @@ export class GitHubAuthService {
   // Check if user is authenticated
   static isAuthenticated(): boolean {
     return this.getAuthState().isAuthenticated;
+  }
+
+  // Connect with fine-grained token
+  static async connectWithToken(token: string): Promise<boolean> {
+    try {
+      const user = await this.fetchGitHubUser(token);
+      if (!user) {
+        throw new Error('Invalid token or insufficient permissions');
+      }
+
+      const hasRepoAccess = await this.validateTokenPermissions(token);
+      if (!hasRepoAccess) {
+        throw new Error('Token must have repository access permissions');
+      }
+
+      const tokenData: GitHubAuthToken = {
+        accessToken: token,
+        tokenType: 'Bearer',
+        scope: 'repo',
+        authMethod: 'token',
+      };
+      this.saveToken(tokenData);
+      this.saveUser(user);
+      this.saveAuthMethod('token');
+
+      return true;
+    } catch (error) {
+      console.error('Token connection error:', error);
+      return false;
+    }
+  }
+
+  // Validate token has required permissions
+  static async validateTokenPermissions(token: string): Promise<boolean> {
+    try {
+      const response = await fetch('https://api.github.com/user/repos?per_page=1', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
   }
 }
