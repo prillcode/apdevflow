@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StorageService } from '../services/storage';
+import { GitHubAuthService } from '../services/auth';
+import { FilePathAutocomplete } from '../components/FilePathAutocomplete';
 import type { WorkType, ContextReference } from '../types';
 
 export const Route = createFileRoute('/planning/new')({
@@ -39,6 +41,52 @@ function NewBodyOfWorkComponent() {
   const [newRefType, setNewRefType] = useState<'path' | 'markdown'>('path');
   const [newRefValue, setNewRefValue] = useState('');
   const [newRefLabel, setNewRefLabel] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [repos, setRepos] = useState<any[]>([]);
+  const [loadingRepos, setLoadingRepos] = useState(false);
+  const [repoFiles, setRepoFiles] = useState<Array<{ path: string }>>([]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+
+  useEffect(() => {
+    const authState = GitHubAuthService.getAuthState();
+    setIsAuthenticated(authState.isAuthenticated);
+
+    if (authState.isAuthenticated) {
+      setLoadingRepos(true);
+      GitHubAuthService.fetchUserRepos()
+        .then((fetchedRepos) => {
+          setRepos(fetchedRepos);
+        })
+        .finally(() => {
+          setLoadingRepos(false);
+        });
+    }
+  }, []);
+
+  // Fetch repo files when repo is selected
+  useEffect(() => {
+    if (!repo || !isAuthenticated) {
+      setRepoFiles([]);
+      return;
+    }
+
+    setLoadingFiles(true);
+    GitHubAuthService.fetchRepoFiles(repo)
+      .then((data) => {
+        if (data) {
+          setRepoFiles(data.files);
+          if (data.truncated) {
+            console.warn('Repository file tree was truncated (>100k files)');
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to fetch repo files:', error);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
+      });
+  }, [repo, isAuthenticated]);
 
   const handleAddContextReference = () => {
     if (!newRefValue.trim() || !newRefLabel.trim()) return;
@@ -210,16 +258,37 @@ function NewBodyOfWorkComponent() {
               GitHub Repository (Optional)
             </label>
             <p className="text-xs text-gray-500 mt-1">
-              Provide the repository URL or name
+              {isAuthenticated 
+                ? 'Select a repository from your GitHub account'
+                : 'Connect to GitHub to select a repository'}
             </p>
-            <input
-              type="text"
-              id="repo"
-              value={repo}
-              onChange={(e) => setRepo(e.target.value)}
-              className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-              placeholder="e.g., https://github.com/org/repo or org/repo"
-            />
+            {isAuthenticated ? (
+              <select
+                id="repo"
+                value={repo}
+                onChange={(e) => setRepo(e.target.value)}
+                disabled={loadingRepos}
+                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {loadingRepos ? 'Loading repositories...' : 'Select a repository'}
+                </option>
+                {repos.map((r) => (
+                  <option key={r.id} value={r.full_name}>
+                    {r.full_name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                id="repo"
+                value={repo}
+                disabled
+                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm px-3 py-2 border bg-gray-100 cursor-not-allowed"
+                placeholder="Connect to GitHub to select a repository"
+              />
+            )}
           </div>
 
           {/* Context References */}
@@ -302,13 +371,26 @@ function NewBodyOfWorkComponent() {
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
                     placeholder="Label (e.g., User Component)"
                   />
-                  <input
-                    type="text"
-                    value={newRefValue}
-                    onChange={(e) => setNewRefValue(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-                    placeholder="Relative path (e.g., src/components/User.tsx)"
-                  />
+                  
+                  {repo && isAuthenticated ? (
+                    <FilePathAutocomplete
+                      value={newRefValue}
+                      onChange={setNewRefValue}
+                      files={repoFiles}
+                      loading={loadingFiles}
+                      placeholder="Start typing to search files..."
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={newRefValue}
+                      onChange={(e) => setNewRefValue(e.target.value)}
+                      disabled={!repo}
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      placeholder={repo ? "Relative path (e.g., src/components/User.tsx)" : "Select a repository first"}
+                    />
+                  )}
+                  
                   <button
                     type="button"
                     onClick={handleAddContextReference}

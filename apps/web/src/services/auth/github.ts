@@ -1,5 +1,5 @@
 // GitHub OAuth service for APDevFlow
-import type { GitHubAuthToken, GitHubUser, AuthState } from '../types';
+import type { GitHubAuthToken, GitHubUser, AuthState } from '../../types';
 
 const AUTH_TOKEN_KEY = 'apdevflow_github_token';
 const AUTH_USER_KEY = 'apdevflow_github_user';
@@ -10,7 +10,7 @@ const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || '';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 const REDIRECT_URI = import.meta.env.VITE_GITHUB_REDIRECT_URI || 'http://localhost:3000/auth/callback';
 
-export class AuthService {
+export class GitHubAuthService {
   // Generate a random state parameter for CSRF protection
   private static generateState(): string {
     return Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -86,6 +86,9 @@ export class AuthService {
       return;
     }
 
+    // Clear any existing state
+    localStorage.removeItem(AUTH_STATE_KEY);
+
     const state = this.generateState();
     localStorage.setItem(AUTH_STATE_KEY, state);
 
@@ -105,6 +108,9 @@ export class AuthService {
     try {
       // Verify state parameter to prevent CSRF
       const savedState = localStorage.getItem(AUTH_STATE_KEY);
+      console.log('Callback state:', state);
+      console.log('Saved state:', savedState);
+      
       if (!savedState || savedState !== state) {
         console.error('Invalid state parameter');
         return false;
@@ -114,7 +120,7 @@ export class AuthService {
       localStorage.removeItem(AUTH_STATE_KEY);
 
       // Exchange code for token via API Lambda
-      const response = await fetch(`${API_URL}/auth/github/exchange`, {
+      const response = await fetch(`${API_URL}/api/github-oauth-exchange`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -208,6 +214,42 @@ export class AuthService {
     } catch (error) {
       console.error('Error fetching repositories:', error);
       return [];
+    }
+  }
+
+  // Fetch repository files
+  static async fetchRepoFiles(repoFullName: string): Promise<{
+    files: Array<{ path: string; type: string; size?: number; sha: string }>;
+    truncated: boolean;
+  } | null> {
+    const token = this.getToken()?.accessToken;
+    if (!token) {
+      console.error('No access token available');
+      return null;
+    }
+
+    try {
+      const [owner, repo] = repoFullName.split('/');
+      
+      const response = await fetch(
+        `${API_URL}/api/github/repos/${owner}/${repo}/files`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error('Failed to fetch repository files');
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching repository files:', error);
+      return null;
     }
   }
 
