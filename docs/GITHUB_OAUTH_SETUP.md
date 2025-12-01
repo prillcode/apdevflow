@@ -1,5 +1,9 @@
 # GitHub OAuth Integration Setup
 
+> **Note:** APDevFlow is designed to be self-hosted. Each deployment (your organization,
+> development team, or individual developer) creates their own GitHub OAuth App with their
+> own credentials. This guide walks you through setting up OAuth for YOUR deployment.
+
 This guide walks you through setting up GitHub OAuth integration for APDevFlow.
 
 ## Overview
@@ -143,11 +147,23 @@ When deploying to AWS Lambda:
 
 ### Environment-Specific Configuration
 
-Use different OAuth apps for different environments:
+Each deployment environment should have its own GitHub OAuth App:
 
-- **Development**: `http://localhost:3000`
-- **Staging**: `https://staging.apdevflow.com`
-- **Production**: `https://apdevflow.com`
+**Local Development:**
+- Callback URL: `http://localhost:3000/auth/callback`
+- Use in `.env.local` files
+- Can be your personal GitHub account
+
+**Production Self-Hosted:**
+- Callback URL: `https://apdevflow.yourcompany.com/auth/callback` (use your actual domain)
+- Set as Lambda environment variables (AWS) or Docker secrets
+- Should be your organization's GitHub account
+
+**Multiple Environments:**
+If you run dev/staging/production, create separate OAuth Apps for each:
+- Development: `http://localhost:3000/auth/callback`
+- Staging: `https://staging-apdevflow.yourcompany.com/auth/callback`
+- Production: `https://apdevflow.yourcompany.com/auth/callback`
 
 ## Troubleshooting
 

@@ -137,11 +137,12 @@ That's it! The monorepo is set up and ready for development. 🚀
 
 - **[Product Requirements Document (Revised)](docs/APP-PRD-Revised.md)** - Complete PRD with architecture, workflows, and MVP phases
 - **[Original PRD](docs/APP-PRD-Original.md)** - Initial planning document (for reference)
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Self-hosted deployment options and setup instructions
+- **[GitHub OAuth Setup](docs/GITHUB_OAUTH_SETUP.md)** - Complete guide to setting up GitHub OAuth integration
 - **[Claude Integration Strategy](docs/CLAUDE-INTEGRATION.md)** - Deep dive on Claude Code vs. Claude API approaches
 - **[Git Worktrees Integration](docs/GIT-WORKTREE-STRAT.md)** - Developer workflow with git worktrees
 - **[Branding Guide](docs/BRANDING.md)** - Brand identity and naming conventions
 - **[Skills Reference](docs/SKILLS.md)** - How APDevFlow uses Claude Code skills
-- **[GitHub OAuth Setup](docs/GITHUB_OAUTH_SETUP.md)** - Complete guide to setting up GitHub OAuth integration
 
 ---
 
