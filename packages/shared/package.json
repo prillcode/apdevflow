@@ -2,6 +2,7 @@
   "name": "@apdevflow/shared",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Shared types, utilities, and constants for APDevFlow",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
