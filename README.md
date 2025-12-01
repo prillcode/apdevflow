@@ -168,6 +168,34 @@ APDevFlow is **NOT** just another JIRA plugin. It's a standalone workflow tool t
 
 ---
 
+## 🔍 How APDevFlow Compares
+
+### vs. GitHub Spec Kit
+
+[GitHub Spec Kit](https://github.com/github/spec-kit) is an excellent CLI tool for spec-driven development. While there's overlap in spec generation, APDevFlow serves a fundamentally different purpose:
+
+| Aspect | GitHub Spec Kit | APDevFlow |
+|--------|----------------|-----------|
+| **What it does** | Generate specs before coding | Full workflow orchestration |
+| **Target user** | Individual developers | Product Owners + Dev Teams |
+| **Scope** | Pre-implementation specs | Idea → Planning → Code → Artifacts |
+| **Architecture** | CLI tool (Python) | Web Dashboard + API + DB + CLI |
+| **Team features** | ❌ Solo-focused | ✅ Collaboration & assignment |
+| **Project management** | ❌ None | ✅ Planning dashboard, tracking |
+| **Self-hosted** | ✅ Yes | ✅ Yes (full infrastructure) |
+
+**The key difference:** Spec Kit is a tool for better specs. APDevFlow is a platform for team coordination.
+
+**Can they work together?** Yes! APDevFlow can optionally integrate Spec Kit as a spec generation engine while providing the team collaboration, planning dashboard, and artifact management layers.
+
+**Think of it as:**
+- Spec Kit = Prettier (excellent code formatter)
+- APDevFlow = VSCode (full IDE that can use Prettier)
+
+See [Competitive Differentiation](docs/MARKETING-IDEAS.md#-competitive-differentiation-apdevflow-vs-github-spec-kit) for detailed comparison.
+
+---
+
 ## 🏗️ Architecture Overview
 
 ### Components
